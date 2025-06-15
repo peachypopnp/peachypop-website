@@ -29,7 +29,7 @@ function App() {
     try {
       const firebaseConfig = process.env.REACT_APP_FIREBASE_CONFIG ? JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG) : {};
       const initialAuthToken = process.env.REACT_APP_INITIAL_AUTH_TOKEN || '';
-      const appId = process.env.REACT_APP_APP_ID || 'default-app-id';
+      
 
       if (Object.keys(firebaseConfig).length === 0) {
         console.warn("Firebase config missing. Running in local preview.");
