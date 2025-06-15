@@ -27,12 +27,11 @@ function App() {
 
   useEffect(() => {
     try {
-      const firebaseConfig = process.env.REACT_APP_FIREBASE_CONFIG ? JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG) : {};
+      const firebaseConfig = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG || '{}');
       const initialAuthToken = process.env.REACT_APP_INITIAL_AUTH_TOKEN || '';
-      
 
       if (Object.keys(firebaseConfig).length === 0) {
-        console.warn("Firebase config missing. Running in local preview.");
+        console.warn("Running locally: Firebase config is missing. Email collection will not work.");
         setMessage("Note: Email collection is disabled in local preview.");
         setIsAuthReady(true);
         return;
@@ -60,7 +59,7 @@ function App() {
             }
             setIsAuthReady(true);
           } catch (authError) {
-            console.error("Auth failed:", authError);
+            console.error("Firebase Anonymous Auth Failed:", authError);
             setMessage("Authentication failed. Cannot collect emails.");
             setIsAuthReady(true);
           }
@@ -69,19 +68,20 @@ function App() {
 
       return () => unsubscribe();
     } catch (error) {
-      console.error("Firebase init error:", error);
-      setMessage("Service init error. Try again later.");
+      console.error("Firebase Initialization Error:", error);
+      setMessage("Error initializing services. Please try again later.");
     }
   }, []);
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
+
     if (!email) {
-      setMessage('Please enter your email.');
+      setMessage('Please enter your email address.');
       return;
     }
     if (!db || !auth || !userId || !isAuthReady) {
-      setMessage('Service not ready. Please wait and try again.');
+      setMessage('Services not ready. Please wait a moment and try again.');
       return;
     }
 
@@ -89,13 +89,13 @@ function App() {
     setMessage('');
 
     try {
-      const appId = process.env.REACT_APP_APP_ID || 'default-app-id';
-      const emailsCollectionRef = collection(db, `artifacts/${appId}/public/data/comingSoonEmails`);
+      const currentAppId = process.env.REACT_APP_APP_ID || 'default-app-id';
+      const emailsCollectionRef = collection(db, `artifacts/${currentAppId}/public/data/comingSoonEmails`);
 
       await addDoc(emailsCollectionRef, {
         email: email,
         timestamp: serverTimestamp(),
-        userId: userId
+        userId: userId,
       });
 
       setMessage("You're on the list! 🍑 Launch info coming soon.");
@@ -128,6 +128,32 @@ function App() {
         <p className="text-lg md:text-xl" style={{ color: colors.warmTaupe }}>
           Be the first to know when we launch on Amazon — and get early-bird offers, tips, and skin love.
         </p>
+
+        <div className="space-y-6 text-lg md:text-xl" style={{ color: colors.warmTaupe }}>
+          <h2 className="text-3xl font-bold mb-4 pt-4 border-t mx-auto max-w-sm" style={{ color: colors.vibrantPeach, borderColor: colors.softRosePink }}>Why We Started PeachyPop</h2>
+          <p>
+            At a young age, I struggled a lot with acne. Everyone used to say, “You should see a dermatologist,” like it was that easy. But I didn’t like going out… I didn’t even like looking in the mirror sometimes. People kept pointing out what was “wrong” with my skin. No one ever said I looked beautiful. And after a while, I started to believe I wasn’t.
+          </p>
+          <p>
+            It wasn’t just the acne — it was how it made me feel: like I wasn’t allowed to feel confident or seen.
+          </p>
+          <p>
+            So I created something I wish I had back then — not just a pimple patch, but a patch that listens. PeachyPop isn’t here to hide your skin. It’s here to help you heal it — gently, quietly, and confidently.
+          </p>
+          <p>
+            This is for the girls who are still healing. The ones who pop silently, spiral quietly, and just want to feel worthy — even in the healing.
+          </p>
+          <p className="font-semibold">
+            This is PeachyPop.
+            <br />
+            Tiny patch. Big energy.
+          </p>
+          <p className="font-semibold text-right">
+            – PJ
+            <br />
+            Founder, PeachyPop Skincare
+          </p>
+        </div>
 
         <form onSubmit={handleSubscribe} className="space-y-5 mt-8">
           <input
