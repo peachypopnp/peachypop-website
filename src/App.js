@@ -27,7 +27,6 @@ function App() {
 
   useEffect(() => {
     try {
-      const appId = window.__app_id || 'default-app';
       const firebaseConfig = window.__firebase_config || {};
       const initialAuthToken = window.__initial_auth_token || '';
 
@@ -89,8 +88,8 @@ function App() {
     setMessage('');
 
     try {
-      const currentAppId = window.__app_id || 'default-app-id';
-      const emailsCollectionRef = collection(db, `artifacts/${currentAppId}/public/data/comingSoonEmails`);
+      const appId = window.__app_id || 'default-app-id';
+      const emailsCollectionRef = collection(db, `artifacts/${appId}/public/data/comingSoonEmails`);
 
       await addDoc(emailsCollectionRef, {
         email: email,
