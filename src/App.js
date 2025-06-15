@@ -27,8 +27,9 @@ function App() {
 
   useEffect(() => {
     try {
-      const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-      const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : '';
+      const firebaseConfig = process.env.REACT_APP_FIREBASE_CONFIG ? JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG) : {};
+      const initialAuthToken = process.env.REACT_APP_INITIAL_AUTH_TOKEN || '';
+      const appId = process.env.REACT_APP_APP_ID || 'default-app-id';
 
       if (Object.keys(firebaseConfig).length === 0) {
         console.warn("Firebase config missing. Running in local preview.");
@@ -88,8 +89,8 @@ function App() {
     setMessage('');
 
     try {
-      const currentAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-      const emailsCollectionRef = collection(db, `artifacts/${currentAppId}/public/data/comingSoonEmails`);
+      const appId = process.env.REACT_APP_APP_ID || 'default-app-id';
+      const emailsCollectionRef = collection(db, `artifacts/${appId}/public/data/comingSoonEmails`);
 
       await addDoc(emailsCollectionRef, {
         email: email,
@@ -141,21 +142,11 @@ function App() {
           />
           <button
             type="submit"
-            className="w-full text-white py-4 rounded-xl font-bold text-xl shadow-lg flex items-center justify-center"
+            className="w-full text-white py-4 rounded-xl font-bold text-xl shadow-lg"
             style={{ backgroundColor: colors.vibrantPeach }}
             disabled={isLoading || !isAuthReady}
           >
-            {isLoading ? (
-              <span className="flex items-center">
-                <svg className="animate-spin -ml-1 mr-3 h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>Subscribing...</span>
-              </span>
-            ) : (
-              'Notify Me!'
-            )}
+            {isLoading ? 'Subscribing...' : 'Notify Me!'}
           </button>
           {message && (
             <p className={`mt-4 text-center font-medium ${message.includes('Error') || message.includes('Please') ? 'text-red-600' : 'text-green-600'}`}>
